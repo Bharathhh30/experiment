@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Q&A</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        #history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .entry {
+            margin-bottom: 20px;
+        }
+        .question {
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+        }
+        .answer {
+            background-color: #e1f7d5;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #a1d99b;
+        }
+        form {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ccc;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            margin-left: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #clear-button {
+            background-color: #dc3545;
+        }
+        #clear-button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div id="history">
+        {% for entry in history %}
+            <div class="entry">
+                <div class="question"><strong>Question:</strong> {{ entry.question }}</div>
+                <div class="answer"><strong>Answer:</strong> {{ entry.answer|safe }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    <form method="post" action="/qa">
+        <input type="text" name="input" placeholder="Ask a question">
+        <button type="submit">Submit</button>
+    </form>
+    <form method="post" action="/clear">
+        <button id="clear-button" type="submit">Clear Session</button>
+    </form>
+
+    <script>
+        // Function to scroll to the bottom of the history container
+        function scrollToBottom() {
+            var historyDiv = document.getElementById('history');
+            historyDiv.scrollTop = historyDiv.scrollHeight;
+        }
+
+        // Call the function after the content is loaded
+        window.onload = scrollToBottom;
+    </script>
+</body>
+</html>

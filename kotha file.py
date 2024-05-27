@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, redirect
 from groq import Groq
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Set a secret key for session management
 
 # Set up Groq client
 client = Groq(
@@ -10,7 +11,10 @@ client = Groq(
 
 @app.route('/', methods=["GET", "POST"])
 def questionanswer():
-    return render_template("render.html")
+    # Initialize session history if it doesn't exist
+    if 'history' not in session:
+        session['history'] = []
+    return render_template("render.html", history=session['history'])
 
 @app.route('/qa', methods=["POST"])
 def qa():
@@ -29,7 +33,21 @@ def qa():
     # Modify the generated text to include HTML formatting
     formatted_text = "<p>" + generated_text.replace("**", "</strong>").replace("\n\n", "</p><p>").replace("\n", "<br>").replace("**", "<strong>") + "</p>"
 
-    return render_template("render.html", ans=formatted_text)
+    # Add the question and answer to the session history
+    session['history'].append({
+        'question': content_given,
+        'answer': formatted_text
+    })
+
+    # Save the session
+    session.modified = True
+
+    return redirect('/')
+
+@app.route('/clear', methods=["POST"])
+def clear():
+    session.clear()
+    return redirect('/')
 
 if __name__ == "__main__":
     app.run(debug=True)
